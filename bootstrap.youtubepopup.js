@@ -114,6 +114,21 @@
         YouTubeURL += "&autoplay=" + options.autoplay + "&controls=" + options.controls + "&fs=" + options.fs + "&loop=" + options.loop;
         YouTubeURL += "&showinfo=" + options.showinfo + "&color=" + options.color + "&theme=" + options.theme;
         YouTubeURL += "&wmode=transparent"; // Firefox Bug Fix
+
+        // Handle starting from a specified time.
+        if(options.startTime){
+          YouTubeUrl += '&';
+          if(options.startTime.hours){
+            YouTubeURL += options.startTime.hours + 'h';
+          }
+          if(options.startTime.minutes){
+            YouTubeURL += options.startTime.minutes+ 'm';
+          }
+          if(options.startTime.seconds){
+            YouTubeURL += options.startTime.seconds+ 's';
+          }
+        }
+
         return YouTubeURL;
     }
 
