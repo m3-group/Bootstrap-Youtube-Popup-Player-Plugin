@@ -41,33 +41,44 @@
 
             return this.each(function () {
                 var obj = $(this);
-                var data = obj.data('YouTube');
+                var data = obj.data('YouTube'),
+                    eachOptions = null;
+
+                // If there are inidividual data-dash override options for this instance.
+                if(obj.data('options')){
+                  var eachOptions = {};
+                  $.extend(eachOptions, obj.data('options'), options);
+                } else {
+                  // Otherwise use global options.
+                  eachOptions = options;
+                }
+
                 if (!data) { //check if event is already assigned
                     obj.data('YouTube', {
                         target: obj
                     });
                     $(obj).bind('click.YouTubeModal', function () {
-                        var youtubeId = options.youtubeId;
+                        var youtubeId = eachOptions.youtubeId;
                         if ($.trim(youtubeId) == '' && obj.is("a")) {
                             youtubeId = getYouTubeIdFromUrl(obj.attr("href"));
                         }
                         if ($.trim(youtubeId) == '' || youtubeId === false) {
-                            youtubeId = obj.attr(options.idAttribute);
+                            youtubeId = obj.attr(eachOptions.idAttribute);
                         }
-                        var videoTitle = $.trim(options.title);
+                        var videoTitle = $.trim(eachOptions.title);
                         if (videoTitle == '') {
-                            if (options.useYouTubeTitle) setYouTubeTitle(youtubeId);
+                            if (eachOptions.useYouTubeTitle) setYouTubeTitle(youtubeId);
                             else videoTitle = obj.attr('title');
                         }
                         if (videoTitle) {
                             setModalTitle(videoTitle);
                         }
 
-                        resizeModal(options.width, options.height);
+                        resizeModal(eachOptions.width, eachOptions.height);
 
                         //Setup YouTube Modal
-                        var YouTubeURL = getYouTubeUrl(youtubeId, options);
-                        var YouTubePlayerIframe = getYouTubePlayer(YouTubeURL, options.width, options.height);
+                        var YouTubeURL = getYouTubeUrl(youtubeId, eachOptions);
+                        var YouTubePlayerIframe = getYouTubePlayer(YouTubeURL, eachOptions.width, eachOptions.height);
                         setModalBody(YouTubePlayerIframe);
                         $YouTubeModal.modal('show');
 
@@ -114,22 +125,12 @@
         YouTubeURL += "&autoplay=" + options.autoplay + "&controls=" + options.controls + "&fs=" + options.fs + "&loop=" + options.loop;
         YouTubeURL += "&showinfo=" + options.showinfo + "&color=" + options.color + "&theme=" + options.theme;
         YouTubeURL += "&wmode=transparent"; // Firefox Bug Fix
-
-        // Handle starting from a specified time.
-        if(options.startTime){
-          YouTubeUrl += '&';
-          if(options.startTime.hours){
-            YouTubeURL += options.startTime.hours + 'h';
-          }
-          if(options.startTime.minutes){
-            YouTubeURL += options.startTime.minutes+ 'm';
-          }
-          if(options.startTime.seconds){
-            YouTubeURL += options.startTime.seconds+ 's';
-          }
-        }
-
+        YouTubeURL += "&start=" + options.start;
         return YouTubeURL;
+    }
+
+    function convertTimeStringToSeconds(s){
+      
     }
 
     function getYouTubePlayer(URL, width, height) {
@@ -181,7 +182,7 @@
         width: 640,
         height: 480,
         autohide: 2,
-        autoplay: 1,
+        autoplay: 0,
         color: 'red',
         controls: 1,
         fs: 1,
